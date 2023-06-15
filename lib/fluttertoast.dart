@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -105,6 +106,13 @@ class Fluttertoast {
 /// Signature for a function to buildCustom Toast
 typedef PositionedToastBuilder = Widget Function(
     BuildContext context, Widget child);
+
+typedef AnimationToastBuilder = Widget Function(
+  BuildContext context,
+  Widget child,
+  Duration toastDuration,
+  Duration animationDuration,
+);
 
 /// Runs on dart side this has no interaction with the Native Side
 /// Works with all platforms just in two lines of code
@@ -232,13 +240,16 @@ class FToast {
   void showToast({
     required Widget child,
     PositionedToastBuilder? positionedToastBuilder,
+    AnimationToastBuilder? animationToastBuilder,
     Duration toastDuration = const Duration(seconds: 2),
     ToastGravity? gravity,
     Duration fadeDuration = const Duration(milliseconds: 350),
   }) {
     if (context == null)
       throw ("Error: Context is null, Please call init(context) before showing toast.");
-    Widget newChild = _ToastStateFul(child, toastDuration, fadeDuration);
+    Widget newChild = animationToastBuilder != null
+        ? animationToastBuilder(context!, child, toastDuration, fadeDuration)
+        : _ToastStateFul(child, toastDuration, fadeDuration);
 
     /// Check for keyboard open
     /// If open will ignore the gravity bottom and change it to center
